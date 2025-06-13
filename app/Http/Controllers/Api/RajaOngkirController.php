@@ -44,28 +44,28 @@ class RajaOngkirController extends Controller
     {
         $response = Http::get("https://wilayah.id/api/provinces.json");
 
-        return response()->json($response->json(['data']));
+        return response()->json($response->json());
     }
 
     public function getKabupaten($codeProvince)
     {
         $response = Http::get("https://wilayah.id/api/regencies/$codeProvince.json");
 
-        return response()->json($response->json(['data']));
+        return response()->json($response->json());
     }
 
     public function getKecamatan($codeKabupaten)
     {
         $response = Http::get("https://wilayah.id/api/districts/$codeKabupaten.json");
 
-        return response()->json($response->json(['data']));
+        return response()->json($response->json());
     }
 
     public function getKelurahan($codeKecamatan)
     {
         $response = Http::get("https://wilayah.id/api/villages/$codeKecamatan.json");
 
-        return response()->json($response->json(['data']));
+        return response()->json($response->json());
     }
 
     // biteship_test.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYmFyYWthLWhpamFiIiwidXNlcklkIjoiNjgzYjAyOTM5MjI3NzgwMDEyZDg4YmEyIiwiaWF0IjoxNzQ4Njk4NTc0fQ.KXy_MQs_frvgTaBCB1EBfIRI6fko5zBY5toDRJF_3ys

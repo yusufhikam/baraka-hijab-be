@@ -66,7 +66,7 @@ class AddressController extends Controller
             'kabupaten' => 'required|string',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
-            'postal_code' => 'required|number',
+            'postal_code' => 'required|string',
             'detail' => 'required|string|max:255',
         ]);
 
