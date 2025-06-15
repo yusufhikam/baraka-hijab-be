@@ -56,4 +56,12 @@ class AddressRepository implements AddressRepositoryInterface
     {
         return Address::where('user_id', $address->user_id)->count();
     }
+
+    // get primary address
+    public function getPrimaryAddress(int $userId)
+    {
+        return Address::where('user_id', $userId)
+                        ->where('is_primary', true)
+                        ->first();
+    }
 }

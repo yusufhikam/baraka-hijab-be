@@ -14,6 +14,7 @@ Route::get('/user', function (Request $request) {
     return $request->user()->only('name', 'email', 'role', 'phone_number');
 })->middleware('auth:sanctum');
 
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -57,3 +58,6 @@ Route::apiResource('/addresses', AddressController::class)->middleware(['auth:sa
 Route::get('/address/{address}', [AddressController::class, 'show'])->middleware(['auth:sanctum', 'role:customer']);
 // set primary address
 Route::patch('/addresses/{address}/set-primary', [AddressController::class, 'setPrimary'])->middleware(['auth:sanctum', 'role:customer']);
+
+// get primary address
+Route::get('/addresses/user/primary-address', [AddressController::class, 'getPrimaryAddress'])->middleware(['auth:sanctum', 'role:customer']);

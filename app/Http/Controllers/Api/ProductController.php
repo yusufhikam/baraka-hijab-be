@@ -35,7 +35,7 @@ class ProductController extends Controller
             $query->latest();
         }
 
-        $products = $query->paginate(6);
+        $products = $query->latest()->paginate(6);
 
         return ProductResource::collection($products);
     }

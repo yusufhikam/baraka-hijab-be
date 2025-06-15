@@ -113,4 +113,24 @@ class AddressController extends Controller
             'message' => 'Address deleted successfully'
         ], 200);
     }
+
+
+    // get primary address 
+    public function getPrimaryAddress(){
+        $userId = Auth::id();
+
+        $primaryAddress = $this->addressService->getPrimaryAddress($userId);
+
+        if(!$primaryAddress){
+            return response()->json([
+                'message' => 'Primary address not found'
+            ], 404);
+        }
+
+        
+        return response()->json([
+            'message' => 'Successfully get primary address',
+            'data' => new AddressResource($primaryAddress)
+        ]);    
+    }
 }

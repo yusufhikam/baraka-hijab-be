@@ -23,4 +23,8 @@ interface AddressRepositoryInterface
 
     // delete an address
     public function delete(Address $address): Address;
+
+    // get primary address
+    public function getPrimaryAddress(int $userId);
+
 }

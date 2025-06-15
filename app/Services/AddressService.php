@@ -49,4 +49,9 @@ class AddressService
     {
         return $this->addressRepository->delete($address);
     }
+
+    // get primary address
+    public function getPrimaryAddress(int $userId){
+        return $this->addressRepository->getPrimaryAddress($userId);
+    }
 }
