@@ -7,8 +7,12 @@ use App\Http\Controllers\api\CartController;
 use App\Http\Controllers\api\AddressController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\GoogleAuthController;
+use App\Http\Controllers\Api\MidtransCallbackController;
+use App\Http\Controllers\Api\OauthController;
 use App\Http\Controllers\Api\RajaOngkirController;
 use App\Http\Controllers\Api\SubCategoryController;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::get('/user', function (Request $request) {
     return $request->user()->only('name', 'email', 'role', 'phone_number');
@@ -18,6 +22,9 @@ Route::get('/user', function (Request $request) {
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+    // Google Auth on web.php
+
 });
 
 Route::get('/products', [ProductController::class, 'index']);
@@ -61,3 +68,7 @@ Route::patch('/addresses/{address}/set-primary', [AddressController::class, 'set
 
 // get primary address
 Route::get('/addresses/user/primary-address', [AddressController::class, 'getPrimaryAddress'])->middleware(['auth:sanctum', 'role:customer']);
+
+
+// TRANSACTION [customer] MIDTRANS
+Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);

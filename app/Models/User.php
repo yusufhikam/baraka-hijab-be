@@ -23,7 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'phone_number'
+        'phone_number',
+        'google_id',
     ];
 
     /**
@@ -59,8 +60,8 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
-    // public function transactions(): HasMany
-    // {
-    //     return $this->hasMany(Transaction::class);
-    // }
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }
