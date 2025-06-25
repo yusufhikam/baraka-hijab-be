@@ -12,20 +12,28 @@ use App\Http\Controllers\Api\MidtransCallbackController;
 use App\Http\Controllers\Api\OauthController;
 use App\Http\Controllers\Api\RajaOngkirController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\UserController;
 use Laravel\Socialite\Facades\Socialite;
 
+
+
 Route::get('/user', function (Request $request) {
-    return $request->user()->only('name', 'email', 'role', 'phone_number');
+    return $request->user()->only('id','name', 'email', 'role', 'phone_number');
 })->middleware('auth:sanctum');
 
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set']);
+});
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
+    
     // Google Auth on web.php
-
+    
 });
+
+Route::patch('/user/{user}', [UserController::class, 'updateProfile'])->middleware(['auth:sanctum', 'role:customer']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/product/{product:slug}', [ProductController::class, 'show']);

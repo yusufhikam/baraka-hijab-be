@@ -19,7 +19,7 @@ class EnsureUserRole
 
         if ($request->user()->role !== $role) {
             if ($request->expectsJson()) {
-                return response()->json(['message', 'Unauthorized'], 401);
+                return response()->json(['message'=> 'Unauthorized'], 401);
             }
 
             Auth::login();

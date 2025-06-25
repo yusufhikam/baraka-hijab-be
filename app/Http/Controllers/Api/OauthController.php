@@ -45,10 +45,11 @@ class OauthController extends Controller
                 ]
             );
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            // $token = $user->createToken('auth_token')->plainTextToken;
+            Auth::login($user, true);
 
             // Redirect ke frontend dengan token
-            return redirect(env('FRONTEND_URL').'/oauth/google/callback?token='.$token);
+            return redirect(env('FRONTEND_URL').'/oauth/google/callback');
 
         } catch (Exception $e) {
             return redirect(env('FRONTEND_URL').'/login?error='.urlencode($e->getMessage()));

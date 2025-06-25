@@ -8,9 +8,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set']);
+});
 
-
-// Route::middleware(['web'])->group(function () {
-    Route::get('/auth/google/redirect', [OauthController::class, 'redirect']);
-    Route::get('/auth/google/callback', [OauthController::class, 'callback']);
-// });
+Route::get('/auth/google/redirect', [OauthController::class, 'redirect']);
+Route::get('/auth/google/callback', [OauthController::class, 'callback']);

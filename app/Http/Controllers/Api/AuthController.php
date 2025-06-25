@@ -27,20 +27,22 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $request->session()->regenerate(); // set cookie session
 
-        return response()->json([
-            'message' => 'Login Successfull',
-            'auth_token' => $token,
-        ]);
+        return response()
+                ->json([
+                    'message' => 'Login Successfull',
+                ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
 
-        return response()->json(['message' => 'Logout Successfull']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()
+                ->json(['message' => 'Logout Successfull']);
     }
 }
