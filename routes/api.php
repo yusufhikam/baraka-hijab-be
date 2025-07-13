@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MidtransCallbackController;
 use App\Http\Controllers\Api\OauthController;
 use App\Http\Controllers\Api\RajaOngkirController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -79,4 +80,11 @@ Route::get('/addresses/user/primary-address', [AddressController::class, 'getPri
 
 
 // TRANSACTION [customer] MIDTRANS
-Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);
+Route::post('/checkout', [TransactionController::class, 'store'])->middleware(['auth:sanctum', 'role:customer']);
+Route::post('/midtrans-callback', [TransactionController::class, 'callback']);
+// get 'pending' user transactions
+Route::get('/user/transactions', [TransactionController::class, 'userTransactions'])->middleware(['auth:sanctum', 'role:customer']);
+// get user history transactions [expired, canceled, paid/settlement]
+Route::get('/user/transactions/history', [TransactionController::class, 'userTransactionHistory'])->middleware(['auth:sanctum', 'role:customer']);
+// cancel transaction
+Route::post('/user/transactions/cancel/{order_id}', [TransactionController::class, 'cancelTransaction'])->middleware(['auth:sanctum', 'role:customer']);

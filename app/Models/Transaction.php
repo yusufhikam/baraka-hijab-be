@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Transaction extends Model
 {
     protected $fillable = [
+        'order_id',
         'user_id',
         'address_id',
         'status',
@@ -19,7 +20,8 @@ class Transaction extends Model
         'payment_status',
         'payment_code',
         'expired_at',
-        'paid_at'
+        'paid_at',
+        'canceled_at'
     ];
 
     public function user():BelongsTo{

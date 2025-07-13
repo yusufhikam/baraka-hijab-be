@@ -2,29 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
-use App\Models\SubCategory;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Forms;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\ColorColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
+use App\Models\Product;
+use Filament\Forms\Form;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\SubCategory;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\ColorPicker;
+use Filament\Tables\Filters\TrashedFilter;
+use App\Filament\Resources\ProductResource\Pages;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ViewColumn;
 
 class ProductResource extends Resource
 {
@@ -49,13 +49,6 @@ class ProductResource extends Resource
                         $subCategory = SubCategory::with('category')->find($state);
                         return $subCategory?->category?->name ? 'Category: ' . $subCategory->category->name : null;
                     }),
-                Select::make('is_ready')
-                    ->options([
-                        true => 'Available',
-                        false => 'Not Available'
-                    ])
-                    ->required()
-                    ->label('Ketersediaan'),
                 TextInput::make('price')
                     ->numeric()
                     ->prefix('IDR')
@@ -95,6 +88,13 @@ class ProductResource extends Resource
                             ->prefix('grams')
                             ->required()
                             ->placeholder('e.g, 1000 for 1kg'),
+                            Select::make('is_ready')
+                            ->options([
+                                true => 'Available',
+                                false => 'Not Available'
+                            ])
+                            ->required()
+                            ->label('Ketersediaan'),
                     ])
 
             ]);
@@ -105,31 +105,32 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('subCategory.category.name'),
-                TextColumn::make('subCategory.name')
-                    ->label('Sub Category'),
+                ->searchable()
+                ->label('Product Name'),
                 ImageColumn::make('thumbnail')
-                    ->disk('public'),
+                ->size(100),
+                TextColumn::make('subCategory.category.name')
+                ->label('Category'),
+                TextColumn::make('subCategory.name')
+                ->label('Sub Category'),
                 TextColumn::make('price')
-                    ->formatStateUsing(fn($state) => number_format($state, 0, ',', '.'))
-                    ->label('Price (IDR)'),
-                ColorColumn::make('productVariants.color')
-                    ->label('Color'),
-                TextColumn::make('is_ready')
-                    ->icon(fn(bool $state) => $state ? 'heroicon-o-check-badge' : 'heroicon-o-x-circle')
-                    ->badge()
-                    ->color(fn(bool $state) => $state ? 'success' : 'danger')
-                    ->formatStateUsing(fn($state) => $state ? 'Available' : 'Not Available')
-                    ->label('Availability'),
-            ])
+                ->label('Price (IDR)')
+                ->formatStateUsing(fn($state) => 'Rp ' . number_format($state, 0, ',', '.')),
+                ViewColumn::make('productVariants')
+                ->label('Product Variants')
+                ->view('filament.adminPanel.product-variant')])
             ->filters([
                 TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ViewAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    ViewAction::make(),
+                ])
+                ->button()
+                ->color('info')
+                ->label('Actions'),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make()
             ])

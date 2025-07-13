@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Address;
+use App\Models\User;
 use App\Repositories\Interfaces\AddressRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -52,9 +53,9 @@ class AddressRepository implements AddressRepositoryInterface
     }
 
     // count addresses by user_id, jika add data address pertama kali maka di set primary[true]
-    public function countByUserId(Address $address): Address
+    public function countByUserId(User $user)
     {
-        return Address::where('user_id', $address->user_id)->count();
+        return Address::where('user_id', $user->id)->count();
     }
 
     // get primary address

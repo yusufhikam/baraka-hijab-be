@@ -37,7 +37,7 @@ class RajaOngkirController extends Controller
         ]);
 
 
-        return response()->json($response->json(['data']));
+        return response()->json($response->json());
     }
 
     public function getProvinsi()

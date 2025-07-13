@@ -18,9 +18,13 @@ class AddressResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'provinsi' => $this->provinsi,
+            'provinsi_name' => $this->provinsi_name,
             'kabupaten' => $this->kabupaten,
+            'kabupaten_name' => $this->kabupaten_name,
             'kecamatan' => $this->kecamatan,
+            'kecamatan_name' => $this->kecamatan_name,
             'kelurahan' => $this->kelurahan,
+            'kelurahan_name' => $this->kelurahan_name,
             'postal_code' => $this->postal_code,
             'detail' => $this->detail,
             'is_primary' => $this->is_primary

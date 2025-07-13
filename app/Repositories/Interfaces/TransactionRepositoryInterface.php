@@ -2,10 +2,24 @@
 
 namespace App\Repositories\Interfaces;
 
-interface TransactionRepositoryInterface{
-    public function create(array $data);
-    public function findById(int $id);
+use App\Models\ProductVariant;
+use App\Models\Transaction;
+use App\Models\User;
+use Illuminate\Http\Request;
 
-    public function storeTransactionItems(int $transactionId, array $data);
-    public function logPayment(int $transactionId, string $raw, string $status);
+interface TransactionRepositoryInterface{
+    public function createTransaction(array $data, array $items): Transaction;
+    
+    public function findByOrderIdAndUser(string $orderId, int $userId): Transaction;
+    public function cancelTransaction( Transaction $transaction): Transaction;
+    public function updatePaymentInfo(Transaction $transaction, array $data): Transaction;
+    public function findByOrderId(string $orderId): ?Transaction;
+    public function findProductVariantById(int $productVariantId): ProductVariant;
+
+    public function userTransactions(User $user);
+
+    public function userTransactionHistory(User $user);
+
+
+    
 }

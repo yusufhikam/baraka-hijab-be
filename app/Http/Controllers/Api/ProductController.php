@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\ProductNewArrivalResource;
 use App\Http\Resources\Api\ProductResource;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -13,7 +14,15 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::with(['subCategory', 'subCategory.category', 'productVariants', 'productVariants.product', 'photos'])->where('is_ready', true);
+        ProductVariant::where('is_ready', true)
+                        ->where('stock', 0)
+                        ->update(['is_ready' => false]);
+                        
+        $query = Product::with(['subCategory', 'subCategory.category', 'productVariants', 'productVariants.product', 'photos'])
+                        ->whereHas('productVariants', function ($q){
+                            $q->where('is_ready', true);
+                        });
+
 
         if ($request->filled('category')) {
             $query->whereHas('subCategory.category', function ($q) use ($request) {

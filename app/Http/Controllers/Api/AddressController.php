@@ -43,9 +43,13 @@ class AddressController extends Controller
         $data = [
             'user_id' => Auth::user()->id,
             'provinsi' => $validated['provinsi'],
+            'provinsi_name' => $request->provinsi_name,
             'kabupaten' => $validated['kabupaten'],
+            'kabupaten_name' => $request->kabupaten_name,
             'kecamatan' => $validated['kecamatan'],
+            'kecamatan_name' => $request->kecamatan_name,
             'kelurahan' => $validated['kelurahan'],
+            'kelurahan_name' => $request->kelurahan_name,
             'detail' => $validated['detail'],
             'postal_code' => $validated['postal_code'],
             'is_primary' => false
@@ -73,9 +77,13 @@ class AddressController extends Controller
         $data = [
             'user_id' => Auth::id(),
             'provinsi' => $validated['provinsi'],
+            'provinsi_name' => $request->provinsi_name,
             'kabupaten' => $validated['kabupaten'],
+            'kabupaten_name' => $request->kabupaten_name,
             'kecamatan' => $validated['kecamatan'],
+            'kecamatan_name' => $request->kecamatan_name,
             'kelurahan' => $validated['kelurahan'],
+            'kelurahan_name' => $request->kelurahan_name,
             'postal_code' => $validated['postal_code'],
             'detail' => $validated['detail'],
         ];

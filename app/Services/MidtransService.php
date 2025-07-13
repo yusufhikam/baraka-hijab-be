@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Transaction;
 use App\Repositories\TransactionRepository;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class MidtransService{
 
@@ -11,10 +13,28 @@ class MidtransService{
 
     public function __construct(TransactionRepository $transactionRepository){
         $this->transactionRepository = $transactionRepository;
+
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+        
+    }
+
+    public function getSnapToken(array $payload){
+        return Snap::getSnapToken($payload);
     }
 
     public function handleCallback(array $data){
-        $orderId = $data['order_id'];
+        $orderId = $data['order_id'] ?? null;
+
+        if(!$orderId){
+            throw new \Exception('Invalid transaction, OrderID not found');
+        }
+        
+        $id = str_replace('TXN-','', $orderId);
+        $transaction = Transaction::findOrFail($id);
+        
         $status = $data['transaction_status'];
         $paymentType = $data['payment_type'];
         $paymentCode = $data['va_numbers'][0]['va_number'] ?? null;
@@ -22,8 +42,6 @@ class MidtransService{
         $transactionTime = $data['transaction_time'];
         $expiredTime = $data['expiry_time'] ?? null;
 
-        $id = str_replace('TXN-','', $orderId);
-        $transaction = Transaction::findOrFail($id);
 
         // update transaction
         $transaction->update([
@@ -39,7 +57,7 @@ class MidtransService{
         ->transactionRepository
         ->logPayment(
             $transaction->id,
-            json_encode($data),
+            $data,
             $status
         );
     }

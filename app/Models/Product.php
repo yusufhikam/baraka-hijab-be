@@ -20,7 +20,6 @@ class Product extends Model
         'description',
         'sub_category_id',
         'status',
-        'is_ready'
     ];
 
     public function setNameAttribute($value)

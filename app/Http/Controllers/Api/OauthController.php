@@ -39,7 +39,7 @@ class OauthController extends Controller
                     'name' => $userGoogle->getName(),
                     'password' => bcrypt(uniqid()),
                     'role' => 'customer',
-                    'phone_number' => '0',
+                    'phone_number' => '',
                     'email_verified_at' => now(),
                     'google_id' => $userGoogle->getId()
                 ]
