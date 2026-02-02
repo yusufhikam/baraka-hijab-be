@@ -16,13 +16,36 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
 
+        if($request->routeIs('api.user.transactions')){
+            return [
+                'id' => $this->id,
+                'name' => $this->name,
+                'thumbnail' => $this->thumbnail,
+                'price' => $this->price,
+                'slug' => $this->slug
+            ];
+        }
+
         if ($request->routeIs('api.carousel')) {
             return [
                 'id' => $this->id,
                 'thumbnail' => $this->thumbnail,
                 'name' => $this->name,
+                'slug' => $this->slug,
+                'product_variants' => ProductVariantResource::collection($this->whenLoaded('productVariants'))
             ];
         };
+
+        if($request->routeIs('api.products.index')){
+            return [
+                'id' => $this->id,
+                'name' => $this->name,
+                'thumbnail' => $this->thumbnail,
+                'slug' => $this->slug,
+                'price' => $this->price,
+                'sub_category' => new SubCategoryResource($this->whenLoaded('subCategory')),
+            ];
+        }
 
         return [
             'id' => $this->id,
@@ -30,11 +53,14 @@ class ProductResource extends JsonResource
             'thumbnail' => $this->thumbnail,
             'slug' => $this->slug,
             'price' => $this->price,
-            'is_ready' => $this->is_ready,
+            'variant_stock' => $this->whenLoaded('productVariants', function(){
+                return $this->productVariants
+                            ->flatMap(fn($variant) => $variant->productVariantOptions)
+                            ->sum('stock');
+            }),
             'description' => $this->description,
-            'subCategory' => new SubCategoryResource($this->whenLoaded('subCategory')),
-            'productVariants' => ProductVariantResource::collection($this->whenLoaded('productVariants')),
-            'photos' => PhotoResource::collection($this->whenLoaded('photos'))
+            'sub_category' => new SubCategoryResource($this->whenLoaded('subCategory')),
+            'product_variants' => ProductVariantResource::collection($this->whenLoaded('productVariants')),
         ];
     }
 }

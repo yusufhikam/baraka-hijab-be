@@ -19,6 +19,9 @@ class ProductNewArrivalResource extends JsonResource
             'slug' => $this->slug,
             'name' => $this->name,
             'thumbnail' => $this->thumbnail,
+            'price' => $this->price,
+            'sub_category' => $this->subCategory,
+            'category' => $this->subCategory->category,
         ];
     }
 }

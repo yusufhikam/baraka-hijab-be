@@ -12,15 +12,15 @@ use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Tables\Filters\TrashedFilter;
 use App\Filament\Resources\ProductResource\Pages;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
@@ -58,45 +58,78 @@ class ProductResource extends Resource
                     ->directory('thumbnails')
                     ->visibility('public')
                     ->image()
+                    ->optimize('webp', ['quality' => 80])
                     ->required(),
-                Repeater::make('photos')
-                    ->relationship('photos')
-                    ->schema([
-                        FileUpload::make('photo')
-                            ->disk('public')
-                            ->directory('products')
-                            ->visibility('public')
-                            ->image()
-                            ->required(),
-                    ]),
-                Textarea::make('description')
-                    ->rows(10)
-                    ->cols(20)
-                    ->required(),
+                RichEditor::make('description')
+                            ->columnSpanFull()
+                            ->disableToolbarButtons([
+                                'attachFiles',
+                            ]),
                 Repeater::make('productVariants')
                     ->relationship('productVariants')
+                    ->label('Product Variants')
+                    ->itemLabel(function ($state){
+                        return $state['name'] ? "Variant : " . ($state['name']) : null;
+                    })
                     ->schema([
-                        TextInput::make('stock')
-                            ->numeric()
-                            ->required(),
-                        TextInput::make('size')
-                            ->required(),
+                        TextInput::make('name')
+                                    ->required(),
                         ColorPicker::make('color')
-                            ->required(),
+                                            ->required(),
                         TextInput::make('weight')
+                            ->label('Weight')
                             ->numeric()
                             ->prefix('grams')
                             ->required()
                             ->placeholder('e.g, 1000 for 1kg'),
-                            Select::make('is_ready')
-                            ->options([
-                                true => 'Available',
-                                false => 'Not Available'
-                            ])
-                            ->required()
-                            ->label('Ketersediaan'),
+                        Repeater::make('productVariantOptions')
+                                ->relationship('productVariantOptions')
+                                ->label("Variant Options")
+                                ->addActionLabel("Add Variant Option")
+                                ->itemLabel(function ($state){
+                                    return $state['size'] ? "Option : " . ($state['size']) : null;
+                                })
+                                ->schema([
+                                    Fieldset::make('Option')
+                                            ->schema([
+                                                TextInput::make('size')
+                                                            ->required(),
+                                                TextInput::make('stock')
+                                                            ->numeric()
+                                                            ->required(),
+                                                Select::make('is_ready')
+                                                        ->options([
+                                                            true => 'Available',
+                                                            false => 'Not Available'
+                                                        ])
+                                                        ->required(),
+                                                
+                                                ])
+                                                ->columns(1)
+                                ])
+                                ->collapsible()
+                                ->columnSpan(2)
+                                ->defaultItems(1),
+                        Repeater::make('photos')
+                                ->relationship('photos')
+                                ->schema([
+                                    FileUpload::make('photo')
+                                        ->disk('public')
+                                        ->directory('products')
+                                        ->visibility('public')
+                                        ->image()
+                                        ->optimize('webp')
+                                        ->required(),
+                                    ])
+                                    ->defaultItems(1)
+                                    ->addActionLabel('Add Variant Photos')
+                                    ->columnSpan(2)
                     ])
-
+                    ->addActionLabel('Add More Product Variant')
+                    ->grid(2)
+                    ->columnSpanFull()
+                    ->columns(1)
+                    ->collapsible()
             ]);
     }
 
@@ -116,9 +149,10 @@ class ProductResource extends Resource
                 TextColumn::make('price')
                 ->label('Price (IDR)')
                 ->formatStateUsing(fn($state) => 'Rp ' . number_format($state, 0, ',', '.')),
-                ViewColumn::make('productVariants')
-                ->label('Product Variants')
-                ->view('filament.adminPanel.product-variant')])
+                // ViewColumn::make('productVariants')
+                // ->label('Product Variants')
+                // ->view('filament.adminPanel.product-variant')
+                ])
             ->filters([
                 TrashedFilter::make(),
             ])

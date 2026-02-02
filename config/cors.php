@@ -15,12 +15,12 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'auth/google/*', 'localhost:5173/*'],
+    'paths' => ['api/*', 'checkout', 'checkout/*', 'midtrans-callback'],
     // 'paths' => ['*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173'],
+    'allowed_origins' => ['http://localhost:5173','http://localhost:3000'],
 
     'allowed_origins_patterns' => [],
 

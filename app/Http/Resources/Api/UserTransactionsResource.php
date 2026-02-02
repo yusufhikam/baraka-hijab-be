@@ -19,7 +19,7 @@ class UserTransactionsResource extends JsonResource
             'user_id' => $this->user_id,
             'address_id' => new AddressResource($this->whenLoaded('address')),
             'order_id' => $this->order_id,
-            'transactionItems' => TransactionItemsResource::collection($this->whenLoaded('transactionItems')),
+            'transaction_items' => TransactionItemsResource::collection($this->whenLoaded('transactionItems')),
             'status' => $this->status,
             'total_price' => $this->total_price,
             'snap_token' => $this->snap_token,

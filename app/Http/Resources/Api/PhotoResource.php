@@ -17,7 +17,7 @@ class PhotoResource extends JsonResource
         return [
             'id' => $this->id,
             'photo' => $this->photo,
-            'product' => new ProductResource($this->whenLoaded('product')),
+            // 'product' => new ProductResource($this->whenLoaded('product')),
         ];
     }
 }

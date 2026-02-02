@@ -17,7 +17,7 @@ class EnsureUserIsCustomer
     public function handle(Request $request, Closure $next): Response
     {
 
-        if ($request->user()->role !== 'ccustomer') {
+        if ($request->user()->role !== 'customer') {
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized'], 401);

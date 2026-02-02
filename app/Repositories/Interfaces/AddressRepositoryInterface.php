@@ -11,7 +11,7 @@ interface AddressRepositoryInterface
     public function getAddressByUserId(int $userId): Collection;
 
     // get address by id
-    public function getAddressById(Address $address, int $userId): Address;
+    public function getAddressById(int $addressId, int $userId): ?Address;
     // Create a new address
     public function create(array $data): Address;
 
@@ -19,10 +19,10 @@ interface AddressRepositoryInterface
     public function update(Address $address, array $data): Address;
 
     // set primary address
-    public function setPrimary(Address $address, array $data): Address;
+    public function setPrimary(int $userId, int $addressId);
 
     // delete an address
-    public function delete(Address $address): Address;
+    public function delete(int $userId, int $addressId);
 
     // get primary address
     public function getPrimaryAddress(int $userId);

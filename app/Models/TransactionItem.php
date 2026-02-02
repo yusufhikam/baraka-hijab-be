@@ -9,7 +9,8 @@ class TransactionItem extends Model
 {
     protected $fillable = [
         'transaction_id',
-        'product_variant_id',
+        // 'product_variant_id',
+        'product_variant_option_id',
         'price',
         'quantity',
         'subtotal'
@@ -19,7 +20,12 @@ class TransactionItem extends Model
         return $this->belongsTo(Transaction::class);
     }
 
-    public function productVariant():BelongsTo{
-        return $this->belongsTo(ProductVariant::class);
+    // public function productVariant():BelongsTo{
+    //     return $this->belongsTo(ProductVariant::class);
+    // }
+
+
+    public function productVariantOption():BelongsTo{
+        return $this->belongsTo(ProductVariantOption::class);
     }
 }

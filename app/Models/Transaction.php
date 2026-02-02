@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,6 +24,18 @@ class Transaction extends Model
         'paid_at',
         'canceled_at'
     ];
+
+    // protected $dates = ['expired_at', 'paid_at', 'canceled_at']; 
+    protected $casts = [
+        'expired_at' => 'datetime',
+        'paid_at' => 'datetime',
+        'canceled_at' => 'datetime'
+    ];
+
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('c'); // ISO-8601
+    }
 
     public function user():BelongsTo{
         return $this->belongsTo(User::class);

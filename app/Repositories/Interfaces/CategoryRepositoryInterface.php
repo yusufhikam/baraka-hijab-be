@@ -8,4 +8,6 @@ interface CategoryRepositoryInterface
 {
 
     public function create(array $data): Category;
+
+    public function getAllCategories();
 }

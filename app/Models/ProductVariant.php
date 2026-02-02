@@ -9,10 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ProductVariant extends Model
 {
     protected $fillable = [
-        'stock',
-        'size',
+        'name',
         'color',
-        'is_ready',
         'weight',
         'product_id',
     ];
@@ -22,12 +20,18 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function carts(): HasMany
-    {
-        return $this->hasMany(Cart::class);
+
+    public function productVariantOptions():HasMany{
+        return $this->hasMany(ProductVariantOption::class);
     }
 
-    public function transactionItems():HasMany{
-        return $this->hasMany(TransactionItem::class);
+    public function photos():HasMany{
+        return $this->hasMany(Photo::class);
     }
+
+  
+
+    // public function transactionItems():HasMany{
+    //     return $this->hasMany(TransactionItem::class);
+    // }
 }

@@ -6,10 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\SubCategoryBestSellerResource;
 use App\Http\Resources\Api\SubCategoryResource;
 use App\Models\SubCategory;
+use App\Services\SubCategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SubCategoryController extends Controller
 {
+
+    protected $subCategoryService;
+
+    public function __construct(SubCategoryService $subCategoryService)
+    {
+        $this->subCategoryService = $subCategoryService;
+    }
 
     public function index(){
         $subCategories = SubCategory::with(['products','category'])->get();
@@ -18,16 +27,22 @@ class SubCategoryController extends Controller
     }
     public function carousel()
     {
-        $subCategories = SubCategory::with([
-            'products' => fn($q2) => $q2->select('id','thumbnail', 'sub_category_id','name')->latest()->limit(1),
-            'category',
-        ])
-        ->whereHas('category', function ($q){
-            $q->where('name', 'hijabs');
-        })
-        ->select('id','name','category_id')
-        ->latest()->take(7)->get();
+        $TTL = 3600; // cache data for 1 hour
+        $key = 'subCategories_carousel_response';
 
-        return SubCategoryBestSellerResource::collection($subCategories);
+        $response = Cache::remember($key, $TTL, function ()  {
+            $subCategories = $this->subCategoryService->getAllSubCategoriesForCarousel();
+
+            $data = SubCategoryBestSellerResource::collection($subCategories)->resolve();
+
+            return [
+                'status' => true,
+                'message' => 'Sub Category for Carousel fetched successfully',
+                'data' => $data
+            ];
+            
+        });
+
+        return response()->json($response);
     }
 }

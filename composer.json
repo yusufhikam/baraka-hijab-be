@@ -11,13 +11,16 @@
         "php": "^8.2",
         "filament/filament": "^3.3",
         "filament/forms": "^3.3",
+        "joshembling/image-optimizer": "^1.6",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.1",
         "laravel/socialite": "^5.21",
         "laravel/tinker": "^2.9",
-        "midtrans/midtrans-php": "^2.6"
+        "midtrans/midtrans-php": "^2.6",
+        "php-open-source-saver/jwt-auth": "^2.3"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.6",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",

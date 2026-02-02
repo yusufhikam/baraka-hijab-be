@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     /*
@@ -14,8 +16,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'guard' => 'api',
+        'passwords' =>  'users',
     ],
 
     /*
@@ -40,10 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        // 'api' => [
-        //     'driver' => 'sanctum',
-        //     'provider' => 'users',
-        // ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'hash' => false
+        ],
     ],
 
     /*
@@ -66,7 +69,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' =>  User::class,
         ],
 
         // 'users' => [

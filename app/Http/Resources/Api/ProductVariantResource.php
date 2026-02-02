@@ -14,13 +14,24 @@ class ProductVariantResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        if($request->routeIs('api.user.transactions')){
+            return [
+                'id' => $this->id,
+                'name' => $this->name,
+                'color' => $this->color,
+                'product' => new ProductResource($this->whenLoaded('product'))
+            ];
+        }
+
         return [
             'id' => $this->id,
-            'stock' => $this->stock,
-            'size' => $this->size,
+            'name' => $this->name,
             'color' => $this->color,
             'weight' => $this->weight,
-            'product' => new ProductResource($this->whenLoaded('product')),
+            'variant_options' => ProductVariantOptionResource::collection($this->whenLoaded('productVariantOptions')),
+            'photos' => PhotoResource::collection($this->whenLoaded('photos'))
+            // 'product' => new ProductResource($this->whenLoaded('product')),
         ];
     }
 }

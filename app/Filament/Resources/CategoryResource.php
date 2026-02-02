@@ -33,6 +33,9 @@ class CategoryResource extends Resource
                     ->maxLength(255),
                 Repeater::make('subCategories')
                     ->relationship('subCategories')
+                    ->itemLabel(function ($state) {
+                        return $state['name'];
+                    })
                     ->schema([
                         TextInput::make('name')
                             ->required()

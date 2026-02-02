@@ -12,16 +12,21 @@ class AddressRepository implements AddressRepositoryInterface
     // ✅ get all addresses by user_id
     public function getAddressByUserId(int $userId): Collection // get all addresses by user_id
     {
-        return Address::where('user_id', $userId)->orderBy('is_primary' , 'desc')->latest()->get();
+        return Address::where('user_id', $userId)
+                        ->orderBy('is_primary' , 'desc')
+                        ->latest()
+                        ->get();
     }
 
     // ✅ get address by id
-    public function getAddressById(Address $address, int $userId): Address
+    public function getAddressById(int $addressId, int $userId): ?Address
     {
-        return Address::where('id', $address->id)->where('user_id',$userId)->first();
+        return Address::where('id', $addressId)
+                        ->where('user_id',$userId)
+                        ->first();
     }
 
-    // ✅ create a new address
+    // ✅ store a new address
     public function create(array $data): Address
     {
 
@@ -36,20 +41,34 @@ class AddressRepository implements AddressRepositoryInterface
         return $address;
     }
 
-    // set primary address
-    public function setPrimary(Address $address, array $data): Address
+    // todo:  ✅ set primary address
+    public function setPrimary(int $userId, int $addressId)
     {
-        $address->update($data);
+        $address = Address::where('user_id', $userId)
+                            ->where('id', $addressId)
+                            ->first();
+
+        // set primary address only one
+        $address->update(['is_primary' => true]);
+
+        // set other address is not primary
+        Address::where('user_id', $userId)
+                ->where('id', '!=', $addressId)
+                ->update(['is_primary' => false]);
+        
+        $address->refresh();
+        
 
         return $address;
     }
 
     // ❌ delete an address
-    public function delete(Address $address): Address
+    public function delete(int $userId, int $addressId)
     {
-        $address->delete();
+        return Address::where("user_id", $userId)
+                            ->where("id", $addressId)
+                            ->delete();
 
-        return $address;
     }
 
     // count addresses by user_id, jika add data address pertama kali maka di set primary[true]

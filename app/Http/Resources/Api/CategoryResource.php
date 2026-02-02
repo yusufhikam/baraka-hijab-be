@@ -20,11 +20,13 @@ class CategoryResource extends JsonResource
             return [
                 'id' => $this->id,
                 'name' => $this->name,
+                'slug' => $this->slug
             ];
         }
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
             'subCategories' => SubCategoryResource::collection($this->whenLoaded('subCategories')),
         ];
     }

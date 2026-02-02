@@ -16,8 +16,8 @@ class TransactionItemsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'transaction_id' => $this->transaction_id,
-            'productVariant' => new ProductVariantResource($this->whenLoaded('productVariant')),
+            // 'transaction_id' => $this->transaction_id,
+            'product_variant_option' => new ProductVariantOptionResource($this->whenLoaded('productVariantOption')),
             'quantity' => $this->quantity,
             'subtotal' => $this->subtotal
         ];

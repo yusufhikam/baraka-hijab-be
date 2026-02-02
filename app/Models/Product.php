@@ -37,9 +37,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class);
     }
-
-    public function photos(): HasMany
-    {
-        return $this->hasMany(Photo::class);
-    }
 }

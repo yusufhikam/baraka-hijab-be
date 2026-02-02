@@ -5,54 +5,85 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\CartResource;
 use App\Models\Cart;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 class CartController extends Controller
 {
+
+    /** @var JWTGuard $guard */
+    protected $guard;
+    protected $cartService;
+
+    public function __construct(CartService $cartService){
+        $this->guard = auth('api');
+        $this->cartService = $cartService;
+    }
     public function index()
     {
-        $user = Auth::user();
+        $userId = $this->guard->id();
 
-        $carts = Cart::with(['user', 'productVariant', 'productVariant.product', 'productVariant.product.subCategory.category'])->where('user_id', $user->id)->latest()->get();
+        // check if user is authenticated
+        if(!$userId){
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized. You need to login first.'
+            ], 401);
+        }
 
-        return CartResource::collection($carts);
+        // inject to service
+        $carts = $this->cartService->getCartsByUserId($userId);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart data fetched successfully',
+            'data' => CartResource::collection($carts)
+        ]);
     }
 
     // add data cart
     public function store(Request $request)
     {
 
+        // make validation
         $validator = Validator::make($request->all(), [
-            'product_variant_id' => 'required|exists:product_variants,id',
-            'quantity' => 'required|min:1'
+            'product_variant_option_id' => 'required|exists:product_variant_options,id',
+            'quantity' => 'required|integer|min:1'
         ]);
 
+        // display error message if validation fails
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation Error',
                 'error' => $validator->errors()
             ], 422);
         }
+        
+        // get payload
+        $payload = $validator->validated();
+        
+        $userId = $this->guard->id();
 
-        $user = Auth::user();
-
-        $cart = Cart::where('user_id', $user->id)->where('product_variant_id', $request->product_variant_id)->first();
-
-        if ($cart) {
-            $cart->quantity += $request->quantity;
-            $cart->save();
-        } else {
-
-            $cart = Cart::create([
-                'user_id' => $user->id,
-                'product_variant_id' => $request->product_variant_id,
-                'quantity' => $request->quantity,
-            ]);
+        // check if user is authenticated
+        if(!$userId){
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized. You need to login first.'
+            ], 401);
         }
 
-        return new CartResource($cart);
+        // inject to service
+       $cart = $this->cartService->store($payload, $userId);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product added to cart successfully',
+            'data' => new CartResource($cart)
+        ]);
     }
 
 
@@ -61,35 +92,30 @@ class CartController extends Controller
     {
         $request->validate([
             'carts' => 'required|array',
-            'carts.*.product_variant_id' => 'required|exists:product_variants,id',
+            'carts.*.product_variant_option_id' => 'required|exists:product_variant_options,id',
             'carts.*.quantity' => 'required|integer|min:1',
         ]);
 
+        $userId = $this->guard->id();
 
-        $user = Auth::user();
-
-        foreach ($request->carts as $item) {
-            $existing = Cart::where('user_id', $user->id)->where('product_variant_id', $item['product_variant_id'])->first();
-
-            if ($existing) {
-                $existing->quantity += $item['quantity'];
-                $existing->save();
-            } else {
-                Cart::create([
-                    'user_id' => $user->id,
-                    'product_variant_id' => $item['product_variant_id'],
-                    'quantity' => $item['quantity']
-                ]);
-            }
+        // check if user is authenticated
+        if(!$userId){
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized. You need to login first.'
+            ], 401);
         }
 
+        $this->cartService->syncFromLocalStorage($request->carts, $userId);
+
         return response()->json([
+            'success' => true,
             'message' => 'Cart synced successfully'
-        ]);
+        ],200);
     }
 
     // patch data quantity cart berdasarkan Product Variant ID
-    public function update(Request $request, $productVariantId)
+    public function update(Request $request, $productVariantOptionId)
     {
         $validator = Validator::make($request->all(), [
             'quantity' => 'required|integer|min:1'
@@ -101,37 +127,56 @@ class CartController extends Controller
                 'error' => $validator->errors()
             ], 422);
         }
-        $user = Auth::user();
 
-        $cart = Cart::where('user_id', $user->id)->where('product_variant_id', $productVariantId)->first();
+        $payload = $validator->validated();
+
+        $userId = $this->guard->id();
+
+        // check if user is authenticated
+        if(!$userId){
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized. You need to login first.'
+            ], 401);
+        }
+
+        $cart = $this->cartService->update(
+                                    $payload,
+                                    $userId, 
+                    $productVariantOptionId
+                                    );
 
         if (!$cart) {
             return response()->json([
+                'success' => false,
                 'message' => 'Cart item not found'
             ], 404);
         }
-
-        $cart->quantity = $request->quantity;
-        $cart->save();
-
-        return new CartResource($cart);
-    }
-    // hapus data cart berdasarkan product variant id
-    public function destroy($productVariantId)
-    {
-        $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->where('product_variant_id', $productVariantId)->first();
-
-        if (!$cart) {
-            return response()->json([
-                'message' => 'Cart item not found'
-            ], 404);
-        }
-
-
-        $cart->delete();
 
         return response()->json([
+            'status' => true,
+            'message' => 'Cart quantity updated successfully',
+            'data' => new CartResource($cart)
+        ]);
+    }
+
+    
+    // todo : hapus data cart berdasarkan product variant id
+    public function destroy($cartId)
+    {
+        $userId = $this->guard->id();
+
+        $cart = $this->cartService->delete($userId, $cartId);
+
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart item not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
             'message' => 'Cart deleted successfully'
         ], 200);
     }

@@ -16,22 +16,23 @@ class EnsureUserRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
+        $user = $request->user();
 
-        if ($request->user()->role !== $role) {
-            if ($request->expectsJson()) {
-                return response()->json(['message'=> 'Unauthorized'], 401);
-            }
-
-            Auth::login();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            if ($role === 'admin') {
-                return redirect('/admin/login')->with('error', 'You are not authorized to access this page.');
-            } else {
-                return redirect('/login')->with('error', 'You are not authorized to access this page.');
-            }
+        if(!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
         }
+
+        if($user->role !== $role){
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden: You are not authorized to access this page.',
+            ], 403);
+        }
+
+        
         return $next($request);
     }
 }

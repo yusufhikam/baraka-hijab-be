@@ -10,14 +10,20 @@ class AddressService
 
     public function __construct(protected AddressRepositoryInterface $addressRepository) {}
 
-    public function getAddressByUserId($userId) // get all addresses by user_id for index
+    // * get all addresses by user_id for index
+    public function getAddressByUserId($userId) 
     {
         return $this->addressRepository->getAddressByUserId($userId);
     }
 
-    public function getAddressById(Address $address, int $userId){
-        return $this->addressRepository->getAddressById($address, $userId);
+    public function getAddressById(int $addressId, int $userId): ?Address
+    {
+        return $this->addressRepository->getAddressById($addressId, $userId);
     }
+
+    /**
+     * * STORE NEW ADDRESS
+     */
     public function create(array $data)
     {
         $first_address = Address::where('user_id', $data['user_id'])->count() === 0;
@@ -35,19 +41,16 @@ class AddressService
     }
 
     // update set Primary address
-    public function setPrimary(Address $address, array $data)
+    public function setPrimary(int $userId, int $addressId)
     {
-        // set all addresses is_primary to false
-        Address::where('user_id', $data['user_id'])->update(['is_primary' => false]);
-
         // set primary address only one
-        return $this->addressRepository->setPrimary($address, $data);
+        return $this->addressRepository->setPrimary($userId, $addressId);
     }
 
     // delete an address
-    public function delete(Address $address)
+    public function delete(int $userId, int $addressId)
     {
-        return $this->addressRepository->delete($address);
+        return $this->addressRepository->delete($userId, $addressId);
     }
 
     // get primary address

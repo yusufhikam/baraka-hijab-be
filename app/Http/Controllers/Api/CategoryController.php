@@ -16,8 +16,11 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all();
-        return CategoryResource::collection($categories);
+        return response()->json([
+            'status' => true,
+            'message' => 'Categories fetched successfully',
+            'data' => CategoryResource::collection($this->categoryService->getCategories())
+        ]);
     }
 
     public function store(Request $request)

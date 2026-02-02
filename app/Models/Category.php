@@ -16,6 +16,12 @@ class Category extends Model
         'slug'
     ];
 
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
